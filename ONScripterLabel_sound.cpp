@@ -526,7 +526,11 @@ int ONScripterLabel::setVolumeMute( bool do_mute )
         music_vol /= 2;
     if (Mix_GetMusicHookData() != NULL) { // for streamed MP3 & OGG
         if ( mp3_sample ) Mix_Volume(mp3_channel, do_mute ? 0 : music_vol); // mp3
-        if ( async_movie ) async_movie->setVolume( do_mute? 0 : music_vol ); // async mpeg
+        if ( async_movie ) {
+#ifndef __EMSCRIPTEN__
+            async_movie->setVolume( do_mute? 0 : music_vol ); // async mpeg
+#endif
+        }
         else music_struct.is_mute = do_mute; // ogg
     } else if (Mix_Playing(MIX_BGM_CHANNEL) == 1) { // wave
         Mix_Volume( MIX_BGM_CHANNEL, do_mute? 0 : music_vol * 128 / 100 );
@@ -549,15 +553,19 @@ int ONScripterLabel::playMPEG( const char *filename, bool async_flag, bool use_p
 {
     int ret = 0;
 
+#ifndef __EMSCRIPTEN__
     if (async_movie) delete async_movie;
+#endif
 
     if (audio_open_flag) Mix_CloseAudio();
 
+#ifndef __EMSCRIPTEN__
     FFMpegWrapper* video_player = new FFMpegWrapper();
     if (video_player->initialize(this, m_window, filename, audio_open_flag, false) != 0) {
         delete video_player;
         return 0;
     }
+#endif
 
     if (use_pos) {
         async_movie_rect.x = xpos;
@@ -584,22 +592,28 @@ int ONScripterLabel::playMPEG( const char *filename, bool async_flag, bool use_p
     }
 
     if (async_flag){
+#ifndef __EMSCRIPTEN__
         async_movie = video_player;
         if (!async_movie->hasAudioStream() && movie_loop_flag) {
             timer_silentmovie_id = SDL_AddTimer(100, silentmovieCallback,
                                                 (void*)&async_movie);
         }
+#endif
         return 0;
     }
 
+#ifndef __EMSCRIPTEN__
     video_player->playFull(true);
+#endif
 
     if (audio_open_flag) {
         Mix_CloseAudio();
         openAudio();
     }
 
+#ifndef __EMSCRIPTEN__
     delete video_player;
+#endif
 
     return ret;
 }

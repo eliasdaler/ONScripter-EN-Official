@@ -1856,7 +1856,9 @@ int ONScripterLabel::movieCommand()
     } else {
         if ( script_h.compareString( "stop" ) ){
             script_h.readName();
+#ifndef __EMSCRIPTEN__
             if (async_movie) async_movie->stopMovie();
+#endif
             async_movie = NULL;
 
             return RET_CONTINUE;
@@ -1984,13 +1986,17 @@ int ONScripterLabel::mesboxCommand()
 int ONScripterLabel::menu_windowCommand()
 {
     if ( fullscreen_mode ){
+#ifndef __EMSCRIPTEN__
         if (async_movie) async_movie->pause();
+#endif
         screen_surface = m_window->SetVideoMode( screen_width, screen_height, screen_bpp, false );
         SDL_Rect rect = {0, 0, screen_width, screen_height};
         flushDirect( rect, refreshMode() );
+#ifndef __EMSCRIPTEN__
         if (async_movie){
             async_movie->play();
         }
+#endif
         fullscreen_mode = false;
     }
 
@@ -2017,7 +2023,9 @@ int ONScripterLabel::menu_fullCommand()
 {
     if ( !fullscreen_mode ){
 #ifndef PSP
+#ifndef __EMSCRIPTEN__
         if (async_movie) async_movie->pause();
+#endif
         screen_surface = m_window->SetVideoMode(screen_width, screen_height, screen_bpp, true);
         if (screen_surface)
             fullscreen_mode = true;
@@ -2028,9 +2036,11 @@ int ONScripterLabel::menu_fullCommand()
         }
         SDL_Rect rect = {0, 0, screen_width, screen_height};
         flushDirect( rect, refreshMode() );
+#ifndef __EMSCRIPTEN__
         if (async_movie){
             async_movie->play();
         }
+#endif
 #else
         fullscreen_mode = true;
 #endif

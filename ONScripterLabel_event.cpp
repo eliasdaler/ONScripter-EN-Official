@@ -125,6 +125,7 @@ extern "C" Uint32 SDLCALL bgmfadeCallback( Uint32 interval, void *param )
 
 extern "C" Uint32 SDLCALL silentmovieCallback( Uint32 interval, void *param )
 {
+#ifndef __EMSCRIPTEN__
     FFMpegWrapper** video_player = static_cast<FFMpegWrapper**>(param);
 
     if ((*video_player) && (*video_player)->getStatus() != Kit_PlayerState::KIT_PLAYING){
@@ -135,6 +136,9 @@ extern "C" Uint32 SDLCALL silentmovieCallback( Uint32 interval, void *param )
     }
 
     return interval;
+#else
+    return 0;
+#endif
 }
 
 // Pushes the midi loop event onto the stack.  Part of a workaround for ONScripter
@@ -295,8 +299,10 @@ void ONScripterLabel::flushEventSub( SDL_Event &event )
     //event related to streaming media
     if ( event.type == ONS_SOUND_EVENT ){
         if (async_movie) {
+#ifndef __EMSCRIPTEN__
             if ((async_movie->getStatus() != Kit_PlayerState::KIT_PLAYING) && (movie_loop_flag))
                 async_movie->play();
+#endif
         } else if ( music_play_loop_flag ||
              (cd_play_loop_flag && !cdaudio_flag ) ){
             stopBGM( true );

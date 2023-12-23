@@ -29,11 +29,17 @@
 
 #include <SDL.h>
 #include <SDL_thread.h>
+#ifndef __EMSCRIPTEN__
 #include "kitchensink/kitchensink.h"
+#endif
 
 class Window;
 class ONScripterLabel;
 struct SDL_RWOps_AVIOContext;
+
+struct Kit_PlayerState;
+struct Kit_Source;
+struct Kit_Player;
 
 class FFMpegWrapper
 {

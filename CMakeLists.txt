@@ -374,8 +374,11 @@ PRIVATE
     $<IF:$<TARGET_EXISTS:SDL2_ttf::SDL2_ttf>,SDL2_ttf::SDL2_ttf,SDL2_ttf::SDL2_ttf-static>
     SDLHelper_CD
     $<IF:$<TARGET_EXISTS:SDL2_sound::SDL2_sound>,SDL2_sound::SDL2_sound,SDL2_sound::SDL2_sound-static>
-    SDL_kitchensink
 )
+
+if (NOT EMSCRIPTEN)
+  target_link_libraries(onscripter_en PRIVATE SDL_kitchensink)
+endif()
 
 if (WIN32)
     target_link_libraries(onscripter_en PRIVATE winmm)

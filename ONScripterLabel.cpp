@@ -2763,7 +2763,9 @@ void ONScripterLabel::quit(bool no_error)
 
     if (async_movie)
     {
+#ifndef __EMSCRIPTEN__
         async_movie->stopMovie();
+#endif
         async_movie = NULL;
     }
 
